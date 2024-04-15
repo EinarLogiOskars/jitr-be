@@ -1,4 +1,4 @@
-CREATE TYPE user_role AS ENUM ('business', 'individual');
+CREATE TYPE user_role AS ENUM ('ROLE_BUSINESS', 'ROLE_INDIVIDUAL');
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
