@@ -1,13 +1,26 @@
 package is.jitr.dto;
 
+import is.jitr.model.UserRole;
+
 public class UserDTO {
 
     private Long id;
     private String username;
     private String email;
-    private String role;
+    private String password;
+    private UserRole role;
 
-    public UserDTO(Long id, String username, String email, String role) {
+    public UserDTO() {
+    }
+
+    public UserDTO(String username, String email, UserRole role, String password) {
+        this.username = username;
+        this.email = email;
+        this.role = role;
+        this.password = password;
+    }
+
+    public UserDTO(Long id, String username, String email, UserRole role) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -38,11 +51,19 @@ public class UserDTO {
         this.email = email;
     }
 
-    public String getRole() {
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 

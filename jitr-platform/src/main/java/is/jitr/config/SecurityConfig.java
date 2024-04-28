@@ -38,7 +38,11 @@ public class SecurityConfig {
                 .cors().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/users/register").permitAll()
+                .antMatchers("/actuator/**").permitAll() // TODO: This needs to be changed before prod, either remove it
+                                                         // or implement an admin role to use this function. This is
+                                                         // used to f.ex. repair migration checksum via
+                                                         // /actuator/flyaway
                 .antMatchers(HttpMethod.POST, "/authenticate").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/business-details").hasAuthority("ROLE_BUSINESS")
                 .anyRequest().authenticated()

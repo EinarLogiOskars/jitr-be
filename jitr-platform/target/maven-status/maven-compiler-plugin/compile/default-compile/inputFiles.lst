@@ -1,5 +1,6 @@
 /home/app/src/main/java/is/jitr/repository/UserRepository.java
 /home/app/src/main/java/is/jitr/model/UserRole.java
+/home/app/src/main/java/is/jitr/dto/UserDTO.java
 /home/app/src/main/java/is/jitr/security/JwtUtil.java
 /home/app/src/main/java/is/jitr/model/User.java
 /home/app/src/main/java/is/jitr/App.java

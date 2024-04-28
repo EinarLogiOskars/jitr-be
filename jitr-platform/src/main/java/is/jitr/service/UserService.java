@@ -1,5 +1,6 @@
 package is.jitr.service;
 
+import is.jitr.dto.UserDTO;
 import is.jitr.model.User;
 import is.jitr.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,13 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public User createUser(User user) {
-        String encodedPassword = passwordEncoder.encode(user.getPasswordHash());
-        user.setPasswordHash(encodedPassword);
+    public User createUser(UserDTO userDto) {
+        User user = new User();
+        user.setUsername(userDto.getUsername());
+        user.setEmail(userDto.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(userDto.getPassword()));
+        user.setRole(userDto.getRole());
+
         return userRepository.save(user);
     }
 }

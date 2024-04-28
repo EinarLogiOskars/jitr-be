@@ -34,7 +34,7 @@ public class User implements UserDetails {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    protected User() {
+    public User() {
     }
 
     public User(Long id, String username, String email, String passwordHash, UserRole role) {

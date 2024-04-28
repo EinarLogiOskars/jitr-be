@@ -44,12 +44,11 @@ public class AuthController {
             final String jwt = jwtUtil.generateToken(user.getUsername());
             Cookie cookie = new Cookie("jwt", jwt);
             cookie.setHttpOnly(true);
-            // Set cookie secure flag based on the environment (false for development)
             cookie.setSecure(false); // TODO: Change to true for prod
             cookie.setPath("/");
             response.addCookie(cookie);
 
-            UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole().toString());
+            UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
 
             return ResponseEntity.ok(userDTO);
 
