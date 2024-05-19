@@ -1,6 +1,8 @@
 package is.jitr.security;
 
 import java.io.IOException;
+import java.util.Arrays;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -26,31 +28,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        Cookie[] cookies = request.getCookies();
+        String jwt = getJwtFromCookies(request);
         String username = null;
-        String jwt = null;
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    jwt = cookie.getValue();
-                    try {
-                        username = jwtUtil.extractUsername(jwt);
-                    } catch (Exception e) {
-                        logger.error("Could not extract username from JWT", e);
-                    }
-                }
-            }
-        }
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (jwt != null) {
             try {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-                if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                username = jwtUtil.extractUsername(jwt);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+                    if (jwtUtil.validateToken(jwt, username)) {
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                 }
             } catch (Exception e) {
                 SecurityContextHolder.clearContext();
@@ -60,6 +51,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(request, response);
+    }
+
+    private String getJwtFromCookies(HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return null;
+
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> "jwt".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse(null);
     }
 
     private void removeJwtCookie(HttpServletResponse response) {

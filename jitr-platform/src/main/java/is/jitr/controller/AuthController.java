@@ -8,6 +8,7 @@ import is.jitr.repository.UserRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,21 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @GetMapping("/validate-cookie")
+    public ResponseEntity<?> validateCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())
+                        && jwtUtil.validateToken(cookie.getValue(), jwtUtil.extractUsername(cookie.getValue()))) {
+                    return ResponseEntity.ok("Cookie is valid");
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired cookie");
+    }
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequest request, HttpServletResponse response) {

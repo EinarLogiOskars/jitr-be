@@ -4,6 +4,7 @@ import is.jitr.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+
 import is.jitr.security.JwtRequestFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -43,6 +46,7 @@ public class SecurityConfig {
                                                          // or implement an admin role to use this function. This is
                                                          // used to f.ex. repair migration checksum via
                                                          // /actuator/flyaway
+                .antMatchers(HttpMethod.GET, "/validate-cookie").permitAll()
                 .antMatchers(HttpMethod.POST, "/authenticate").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/business-details").hasAuthority("ROLE_BUSINESS")
                 .anyRequest().authenticated()
@@ -52,8 +56,8 @@ public class SecurityConfig {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .deleteCookies("JWT")
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
+                .deleteCookies("jwt")
                 .and()
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 

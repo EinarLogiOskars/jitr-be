@@ -28,10 +28,11 @@ public class User implements UserDetails {
     private UserRole role;
 
     @CreationTimestamp
-    @Column(updatable = false, nullable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     public User() {
