@@ -5,10 +5,13 @@ import javax.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "shifts")
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Shift {
 
     @Id
@@ -18,8 +21,10 @@ public class Shift {
     @Column(name = "work_type_id", nullable = false)
     private Integer workTypeId;
 
-    @Column(name = "property_id", nullable = false)
-    private Long propertyId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "property_id")
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    private Property property;
 
     @Column(name = "filled_by_user_id")
     private Long filledByUserId;
@@ -51,14 +56,21 @@ public class Shift {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @PrePersist
+    public void prePersist() {
+        if (this.status == null) {
+            this.status = ShiftStatus.UNFILLED;
+        }
+    }
+
     public Shift() {
     }
 
-    public Shift(Long id, Integer workTypeId, Long propertyId, String shiftDetails, LocalDateTime estimatedShiftStart,
+    public Shift(Long id, Integer workTypeId, Property property, String shiftDetails, LocalDateTime estimatedShiftStart,
             LocalDateTime estimatedShiftEnd) {
         this.id = id;
         this.workTypeId = workTypeId;
-        this.propertyId = propertyId;
+        this.property = property;
         this.shiftDetails = shiftDetails;
         this.estimatedShiftStart = estimatedShiftStart;
         this.estimatedShiftEnd = estimatedShiftEnd;
@@ -80,12 +92,12 @@ public class Shift {
         this.workTypeId = workTypeId;
     }
 
-    public Long getPropertyId() {
-        return propertyId;
+    public Property getProperty() {
+        return property;
     }
 
-    public void setPropertyId(Long propertyId) {
-        this.propertyId = propertyId;
+    public void setProperty(Property property) {
+        this.property = property;
     }
 
     public Long getFilledByUserId() {

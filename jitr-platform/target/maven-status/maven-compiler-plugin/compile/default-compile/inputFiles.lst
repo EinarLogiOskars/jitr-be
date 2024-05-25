@@ -13,9 +13,11 @@
 /home/app/src/main/java/is/jitr/service/CustomUserDetailsService.java
 /home/app/src/main/java/is/jitr/controller/ShiftController.java
 /home/app/src/main/java/is/jitr/service/WorkTypesService.java
+/home/app/src/main/java/is/jitr/mapper/ShiftMapper.java
 /home/app/src/main/java/is/jitr/dto/PropertyDTO.java
 /home/app/src/main/java/is/jitr/service/PropertyService.java
 /home/app/src/main/java/is/jitr/model/Property.java
+/home/app/src/main/java/is/jitr/config/JacksonConfig.java
 /home/app/src/main/java/is/jitr/model/User.java
 /home/app/src/main/java/is/jitr/model/BusinessDetails.java
 /home/app/src/main/java/is/jitr/dto/ShiftDTO.java

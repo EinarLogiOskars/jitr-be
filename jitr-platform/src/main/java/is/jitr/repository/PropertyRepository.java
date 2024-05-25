@@ -12,4 +12,6 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     @Query("SELECT p FROM Property p WHERE p.businessDetails.user.id = :userId")
     List<Property> findByUserId(@Param("userId") Long userId);
+
+    List<Property> findByBusinessDetailsId(Long businessId);
 }

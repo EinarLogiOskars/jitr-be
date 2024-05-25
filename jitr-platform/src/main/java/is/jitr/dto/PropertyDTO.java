@@ -2,16 +2,28 @@ package is.jitr.dto;
 
 public class PropertyDTO {
 
+    private Long id;
     private Long businessId;
     private String propertyName;
     private String propertyAddress;
     private String propertyPhone;
+
+    public PropertyDTO() {
+    }
 
     public PropertyDTO(Long businessId, String propertyName, String propertyAddress, String propertyPhone) {
         this.businessId = businessId;
         this.propertyName = propertyName;
         this.propertyAddress = propertyAddress;
         this.propertyPhone = propertyPhone;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getBusinessId() {
