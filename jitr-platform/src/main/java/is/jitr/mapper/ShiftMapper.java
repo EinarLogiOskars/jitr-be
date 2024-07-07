@@ -13,6 +13,7 @@ public class ShiftMapper {
         dto.setId(shift.getId());
         dto.setWorkTypeId(shift.getWorkTypeId());
         dto.setPropertyId(shift.getProperty().getId());
+        dto.setFilledByUserId(shift.getFilledByUserId());
         dto.setShiftDetails(shift.getShiftDetails());
         dto.setEstimatedShiftStart(shift.getEstimatedShiftStart());
         dto.setShiftStart(shift.getShiftStart());

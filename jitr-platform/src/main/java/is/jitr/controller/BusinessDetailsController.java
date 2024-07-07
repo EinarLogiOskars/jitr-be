@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import is.jitr.model.BusinessDetails;
 import is.jitr.model.User;
-import is.jitr.repository.UserRepository;
 import is.jitr.service.BusinessDetailsService;
+import is.jitr.service.UserService;
 
 @RestController
 @RequestMapping("api/business-details")
@@ -28,33 +27,25 @@ public class BusinessDetailsController {
     private BusinessDetailsService service;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @GetMapping(produces = "application/json")
     @PreAuthorize("hasAuthority('ROLE_BUSINESS')")
     public ResponseEntity<List<BusinessDetails>> findAllForUser(Authentication authentication) {
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        User user = userService.findUser(username);
 
         return ResponseEntity.ok(service.findAllBusinessDetailsByUser(user));
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")
-    @PreAuthorize("hasAuthority('ROLE_BUSINESS')")
+    @PreAuthorize("hasAuthority('ROLE_BUSINESS') and @businessDetailsService.isOwner(#id, authentication.name)")
     public ResponseEntity<BusinessDetails> findById(@PathVariable("id") Long id, Authentication authentication) {
 
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        BusinessDetails businessDetails = service.findById(id);
+        return ResponseEntity.ok(businessDetails);
 
-        BusinessDetails details = service.findById(id);
-        if (details.getUser().getId() == user.getId()) {
-            return ResponseEntity.ok(details);
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
     }
 
     @PostMapping("/register")
@@ -63,8 +54,7 @@ public class BusinessDetailsController {
             Authentication authentication) {
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        User user = userService.findUser(username);
 
         businessDetails.setUser(user);
         BusinessDetails createdDetails = service.createBusinessDetails(businessDetails);

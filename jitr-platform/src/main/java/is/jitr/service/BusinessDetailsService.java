@@ -31,4 +31,8 @@ public class BusinessDetailsService {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Business details not found with id: " + id));
     }
+
+    public boolean isOwner(Long businessId, String username) {
+        return repository.isOwnedBy(businessId, username);
+    }
 }

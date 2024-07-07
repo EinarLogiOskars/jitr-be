@@ -9,6 +9,7 @@ public class ShiftDTO {
     private Long id;
     private Integer workTypeId;
     private Long propertyId;
+    private Long filledByUserId;
     private String shiftDetails;
     private LocalDateTime estimatedShiftStart;
     private LocalDateTime shiftStart;
@@ -74,6 +75,14 @@ public class ShiftDTO {
 
     public void setPropertyId(Long propertyId) {
         this.propertyId = propertyId;
+    }
+
+    public Long getFilledByUserId() {
+        return filledByUserId;
+    }
+
+    public void setFilledByUserId(Long filledByUserId) {
+        this.filledByUserId = filledByUserId;
     }
 
     public String getShiftDetails() {

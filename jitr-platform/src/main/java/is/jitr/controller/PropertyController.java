@@ -42,14 +42,21 @@ public class PropertyController {
 
     @GetMapping(path = "/business/{businessId}", produces = "application/json")
     @PreAuthorize("hasAuthority('ROLE_BUSINESS')")
-    public ResponseEntity<List<PropertyDTO>> findAllForBusiness(@PathVariable Long businessId) {
-        return ResponseEntity.ok(service.findAllPropertiesByBusiness(businessId));
+    public ResponseEntity<List<PropertyDTO>> findAllForBusiness(@PathVariable Long businessId,
+            Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        return ResponseEntity.ok(service.findAllPropertiesByBusiness(businessId, user));
     }
 
     @PostMapping("/register")
     @PreAuthorize("hasAuthority('ROLE_BUSINESS')")
-    public ResponseEntity<PropertyDTO> createProperty(@RequestBody PropertyDTO propertyDTO) {
-        Property property = service.createProperty(propertyDTO);
+    public ResponseEntity<PropertyDTO> createProperty(@RequestBody PropertyDTO propertyDTO,
+            Authentication authentication) {
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Property property = service.createProperty(propertyDTO, user);
         PropertyDTO createdProperty = new PropertyDTO(property.getBusinessDetails().getId(), property.getPropertyName(),
                 property.getPropertyAddress(), property.getPropertyPhone());
         return ResponseEntity.ok(createdProperty);

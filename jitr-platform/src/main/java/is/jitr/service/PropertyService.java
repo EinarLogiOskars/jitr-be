@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import is.jitr.dto.PropertyDTO;
@@ -28,11 +29,15 @@ public class PropertyService {
     private BusinessDetailsRepository businessDetailsRepository;
 
     @Transactional
-    public Property createProperty(PropertyDTO propertyDTO) {
+    public Property createProperty(PropertyDTO propertyDTO, User user) {
         Property property = new Property();
 
         BusinessDetails businessDetails = businessDetailsRepository.findById(propertyDTO.getBusinessId())
                 .orElseThrow(() -> new EntityNotFoundException("No business with id: " + propertyDTO.getBusinessId()));
+
+        if (!businessDetails.getUser().equals(user)) {
+            throw new AccessDeniedException("You do not have permission to add properties to this business");
+        }
 
         property.setBusinessDetails(businessDetails);
         property.setPropertyName(propertyDTO.getPropertyName());
@@ -48,26 +53,26 @@ public class PropertyService {
 
     public List<PropertyDTO> findAllPropertiesByUser(User user) {
         List<Property> properties = repository.findByUserId(user.getId());
-
-        if (properties.isEmpty()) {
-            throw new EntityNotFoundException("No properties found for user");
-        }
-
         List<PropertyDTO> propertyDTOs = PropertyMapper.toDTOs(properties);
 
         return propertyDTOs;
     }
 
-    public List<PropertyDTO> findAllPropertiesByBusiness(Long businessId) {
-        List<Property> properties = repository.findByBusinessDetailsId(businessId);
-
-        if (properties.isEmpty()) {
-            throw new EntityNotFoundException("No properties found for businessId: " + businessId);
+    public List<PropertyDTO> findAllPropertiesByBusiness(Long businessId, User user) {
+        BusinessDetails businessDetails = businessDetailsRepository.findById(businessId)
+                .orElseThrow(() -> new EntityNotFoundException("Business not found with id: " + businessId));
+        if (!businessDetails.getUser().equals(user)) {
+            throw new AccessDeniedException("You do not have permission to view properties of this business");
         }
 
+        List<Property> properties = repository.findByBusinessDetailsId(businessId);
         List<PropertyDTO> propertyDTOs = PropertyMapper.toDTOs(properties);
 
         return propertyDTOs;
 
+    }
+
+    public boolean isOwner(Long propertyId, String username) {
+        return repository.isOwnedBy(propertyId, username);
     }
 }
